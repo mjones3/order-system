@@ -1,0 +1,92 @@
+
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.61.0"
+    }
+  }
+
+  required_version = ">= 1.2.0"
+}
+
+provider "aws" {
+  region = "us-east-1"
+}
+
+
+module "network" {
+  source         = "./modules/network"
+  vpc_cidr       = "172.1.0.0/16"
+  public_subnet  = ["172.1.1.0/24", "172.1.2.0/24"]
+  private_subnet = ["172.1.3.0/24", "172.1.4.0/24"]
+  tags = {
+    Environment = "dev"
+    Project     = "order-system"
+  }
+}
+
+module "api" {
+  source = "./modules/api"
+
+}
+
+
+module "iam" {
+  source = "./modules/iam"
+}
+
+module "ecr_repo" {
+  source                      = "./modules/ecr_repo"
+  repository_name             = "order-system-repo"
+  ecs_task_execution_role_arn = module.iam.ecs_task_execution_role_arn
+  vpc_id                      = module.network.vpc_id
+  vpc_endpoint_sg             = module.network.vpc_endpoint_sg
+  private_subnets             = module.network.private_subnets
+
+}
+
+module "ecs" {
+  source          = "./modules/ecs"
+  vpc_id          = module.network.vpc_id
+  vpc_endpoint_sg = module.network.vpc_endpoint_sg
+}
+
+module "ecs_order_service" {
+  source              = "./modules/services/order_service"
+  public_subnets      = module.network.public_subnets
+  private_subnets     = module.network.private_subnets
+  execution_role_arn  = module.iam.ecs_task_execution_role_arn
+  order_service_image = var.order_service_image
+  fargate_cluster     = module.ecs.fargate_cluster
+  fargate_sg          = module.network.fargate_sg
+  vpc_endpoint_sg     = module.network.vpc_endpoint_sg
+  vpc_id              = module.network.vpc_id
+  rds_endpoint        = module.order_service_db.rds_endpoint
+  db_name             = "orderdb"
+  db_username         = "orderuser"
+  db_password         = "secretpassword"
+}
+
+module "order_service_db" {
+  source            = "./modules/services/order_service/db"
+  allocated_storage = 10
+  #   storage_type      = "gp2"
+  engine_version = "17.2"
+  instance_class = "db.t3.micro"
+  db_name        = "orderdb"
+  username       = "orderuser"
+  password       = "secretpassword"
+  task_role_arn  = ""
+  #   parameter_group_name   = "default.postgres13"
+  publicly_accessible    = false
+  vpc_security_group_ids = [module.network.postgresql-sg]
+  db_subnet_group_name   = module.network.order_db_subnet_group.name
+  private_subnets        = module.network.private_subnets
+  multi_az               = false
+  tags = {
+    Environment = "dev"
+    Service     = "order-service"
+  }
+}
+
