@@ -5,11 +5,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "orders")
+@ToString
 public class Order {
 
     @Id
@@ -19,8 +21,6 @@ public class Order {
     private String product;
     private int quantity;
     private BigDecimal price;
-
-    // Getters and setters
 
     public Long getId() {
         return id;
@@ -53,4 +53,5 @@ public class Order {
     public void setPrice(BigDecimal price) {
         this.price = price;
     }
+
 }
