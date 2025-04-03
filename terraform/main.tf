@@ -27,13 +27,17 @@ module "network" {
 }
 
 module "api" {
-  source = "./modules/api"
-
+  source        = "./modules/api"
+  orders_lb_dns = module.ecs_order_service.order_lb_dns
 }
 
 
 module "iam" {
   source = "./modules/iam"
+}
+
+module "sqs" {
+  source = "./modules/sqs"
 }
 
 module "ecr_repo" {

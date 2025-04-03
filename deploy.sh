@@ -38,3 +38,5 @@ terraform apply \
   -var="inventory_service_image=${ECR_REPO_URL}:inventory-service-${IMAGE_TAG}" \
   -var="payment_service_image=${ECR_REPO_URL}:payment-service-${IMAGE_TAG}" \
   -auto-approve
+# terraform refresh
+# terraform output module.api.orders_api_endpoint
