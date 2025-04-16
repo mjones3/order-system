@@ -1,4 +1,4 @@
-package com.elusivemel.inventory_service;
+package com.elusivemel.inventoryservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

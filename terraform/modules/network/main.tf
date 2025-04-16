@@ -118,52 +118,18 @@ resource "aws_subnet" "private" {
   }
 }
 
-# Allocate an Elastic IP for the NAT Gateway
-# resource "aws_eip" "nat" {
-# }
-
-# # Create a NAT Gateway in one of the public subnets
-# resource "aws_nat_gateway" "this" {
-#   allocation_id = aws_eip.nat.id
-#   subnet_id     = aws_subnet.public[0].id
-
-#   tags = {
-#     Name = "nat-gateway"
-#   }
-# }
-
-# Create a route table for private subnets with a default route through the NAT Gateway
-# resource "aws_route_table" "private" {
-#   vpc_id = aws_vpc.this.id
-
-#   route {
-#     cidr_block     = "0.0.0.0/0"
-#     nat_gateway_id = aws_nat_gateway.this.id
-#   }
-
-#   tags = {
-#     Name = "private-route-table"
-#   }
-# }
-
-# Associate the private route table with private subnets
-# resource "aws_route_table_association" "private_assoc" {
-#   count          = length(var.private_subnet)
-#   subnet_id      = aws_subnet.private[count.index].id
-#   route_table_id = aws_route_table.private.id
-# }
-
-
-
 
 resource "aws_db_subnet_group" "order_db_subnet_group" {
   name       = "order-system-db-subnet-group"
   subnet_ids = aws_subnet.private[*].id # List of subnet IDs in your VPC that you want to use for your DB
   tags       = var.tags
 }
-#
-# Internet Gateway for public subnets
-#
+
+resource "aws_db_subnet_group" "inventory_db_subnet_group" {
+  name       = "inventory-system-db-subnet-group"
+  subnet_ids = aws_subnet.private[*].id # List of subnet IDs in your VPC that you want to use for your DB
+  tags       = var.tags
+}
 
 resource "aws_security_group" "postgresql-sg" {
   name        = "postgresql-sg"

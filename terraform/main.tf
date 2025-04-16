@@ -39,10 +39,11 @@ module "lambda" {
 }
 
 module "iam" {
-  source                                    = "./modules/iam"
-  aws_lambda_function_order_service_arn     = module.lambda.aws_lambda_function_order_service_arn
-  aws_lambda_function_email_service_arn     = module.lambda.aws_lambda_function_email_service_arn
-  aws_lambda_function_inventory_service_arn = module.lambda.aws_lambda_function_inventory_service_arn
+  source                                         = "./modules/iam"
+  aws_lambda_function_order_service_arn          = module.lambda.aws_lambda_function_order_service_arn
+  aws_lambda_function_email_service_arn          = module.lambda.aws_lambda_function_email_service_arn
+  aws_lambda_function_inventory_service_arn      = module.lambda.aws_lambda_function_inventory_service_arn
+  aws_lambda_function_order_callback_service_arn = module.lambda.aws_lambda_function_order_callback_service_arn
 }
 
 module "sqs" {
@@ -100,6 +101,45 @@ module "order_service_db" {
   tags = {
     Environment = "dev"
     Service     = "order-service"
+  }
+}
+
+
+module "ecs_inventory_service" {
+  source                  = "./modules/services/inventory_service"
+  public_subnets          = module.network.public_subnets
+  private_subnets         = module.network.private_subnets
+  execution_role_arn      = module.iam.ecs_task_execution_role_arn
+  inventory_service_image = var.inventory_service_image
+  fargate_cluster         = module.ecs.fargate_cluster
+  fargate_sg              = module.network.fargate_sg
+  vpc_endpoint_sg         = module.network.vpc_endpoint_sg
+  vpc_id                  = module.network.vpc_id
+  rds_endpoint            = module.inventory_service_db.rds_endpoint
+  db_name                 = "inventorydb"
+  db_username             = "inventoryuser"
+  db_password             = "secretpassword"
+}
+
+module "inventory_service_db" {
+  source            = "./modules/services/inventory_service/db"
+  allocated_storage = 10
+  #   storage_type      = "gp2"
+  engine_version = "17.2"
+  instance_class = "db.t3.micro"
+  db_name        = "inventorydb"
+  username       = "inventoryuser"
+  password       = "secretpassword"
+  task_role_arn  = ""
+  #   parameter_group_name   = "default.postgres13"
+  publicly_accessible    = false
+  vpc_security_group_ids = [module.network.postgresql-sg]
+  db_subnet_group_name   = module.network.inventory_db_subnet_group.name
+  private_subnets        = module.network.private_subnets
+  multi_az               = false
+  tags = {
+    Environment = "dev"
+    Service     = "inventory-service"
   }
 }
 
