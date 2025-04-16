@@ -31,9 +31,18 @@ module "api" {
   orders_lb_dns = module.ecs_order_service.order_lb_dns
 }
 
+module "lambda" {
+  source                     = "./modules/lambda"
+  aws_iam_role_sfn_role_arn  = module.iam.aws_iam_role_sfn_role_arn
+  lambda_exec_role_arn       = module.iam.lambda_exec_role_arn
+  aws_lambda_assume_role_arn = module.iam.aws_lambda_assume_role_arn
+}
 
 module "iam" {
-  source = "./modules/iam"
+  source                                    = "./modules/iam"
+  aws_lambda_function_order_service_arn     = module.lambda.aws_lambda_function_order_service_arn
+  aws_lambda_function_email_service_arn     = module.lambda.aws_lambda_function_email_service_arn
+  aws_lambda_function_inventory_service_arn = module.lambda.aws_lambda_function_inventory_service_arn
 }
 
 module "sqs" {

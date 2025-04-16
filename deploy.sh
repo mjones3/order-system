@@ -30,6 +30,49 @@ for service in "${services[@]}"; do
   echo "-------------------------------------------------------"
 done
 
+#lambdas
+
+# Define parallel arrays: one for Lambda function names and one for their corresponding source directories (where the ZIP file is located)
+lambda_names=("orderServiceFunction" "emailServiceFunction" "orderCallbackFunction" "inventoryServiceFunction")
+lambda_dirs=(
+  "./apps/functions/order-service-handler"    # orderServiceFunction ZIP is in this folder
+  "./apps/functions/email-service"              # emailServiceFunction
+  "./apps/functions/order-callback"             # orderCallbackFunction
+  "./apps/functions/inventory-service-handler"    # inventoryServiceFunction
+)
+
+# Loop over the arrays using indices.
+for i in "${!lambda_names[@]}"; do
+  lambda="${lambda_names[$i]}"
+  LAMBDA_DIR="${lambda_dirs[$i]}"
+  ZIP_FILE="${LAMBDA_DIR}/${lambda}.zip"  # Build path relative to each lambda's directory
+  CHECKSUM_FILE="./${lambda}.checksum"
+  echo "-------------------------------------------------------"
+  echo "Checking for changes in $lambda code in $LAMBDA_DIR..."
+
+  # Compute a combined checksum for all files in the Lambda source directory.
+  CURRENT_CHECKSUM=$(find "$LAMBDA_DIR" -type f -exec sha256sum {} \; | sort | sha256sum | awk '{print $1}')
+
+  # Read stored checksum if it exists.
+  if [ -f "$CHECKSUM_FILE" ]; then
+      STORED_CHECKSUM=$(cat "$CHECKSUM_FILE")
+  else
+      STORED_CHECKSUM=""
+  fi
+
+  if [ "$CURRENT_CHECKSUM" != "$STORED_CHECKSUM" ]; then
+      echo "Changes detected for $lambda. Packaging source into $ZIP_FILE..."
+      # Create the ZIP package. Change directory to the Lambda directory and zip its contents.
+      pushd "$LAMBDA_DIR" > /dev/null
+      zip -r "${lambda}.zip" .
+      popd > /dev/null
+
+      # Update the checksum file.
+      echo "$CURRENT_CHECKSUM" > "$CHECKSUM_FILE"
+  fi
+done
+
+
 # Now run Terraform, passing each service's image URI as a variable.
 cd terraform
 terraform init
@@ -40,3 +83,18 @@ terraform apply \
   -auto-approve
 # terraform refresh
 # terraform output module.api.orders_api_endpoint
+
+# Loop over the arrays using indices.
+for i in "${!lambda_names[@]}"; do
+  lambda="${lambda_names[$i]}"
+  LAMBDA_DIR="${lambda_dirs[$i]}"
+  ZIP_FILE="${LAMBDA_DIR}/${lambda}.zip"  # Build path relative to each lambda's directory
+  CHECKSUM_FILE="./${lambda}.checksum"
+    # Update the Lambda function code on AWS.
+    echo "Updating Lambda function code for $lambda..."
+    aws lambda update-function-code --function-name "$lambda" --zip-file fileb://"$ZIP_FILE"
+  else
+      echo "No changes detected for $lambda. Skipping packaging and update."
+  fi
+  echo "-------------------------------------------------------"
+done

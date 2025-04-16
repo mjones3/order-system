@@ -1,4 +1,4 @@
-resource "aws_sqs_queue" "orders" {
+resource "aws_sqs_queue" "orders_queue" {
   name                       = "orders-queue"
   delay_seconds              = 0
   max_message_size           = 262144
