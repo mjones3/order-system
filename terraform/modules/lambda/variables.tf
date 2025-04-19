@@ -5,8 +5,10 @@ variable "aws_iam_role_sfn_role_arn" {
 variable "lambda_exec_role_arn" {
   type = string
 }
-
 variable "aws_lambda_assume_role_arn" {
   type = string
 }
 
+variable "api_endpoint_orders" {
+  type = string
+}

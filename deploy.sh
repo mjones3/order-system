@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 set -e
+set -euxo pipefail
+
+# Determine the project root (where this script lives)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="${SCRIPT_DIR}"
+
+echo "Project root is: $PROJECT_ROOT"
 
 # Define a single ECR repository URL for all services
 ECR_REPO_URL="294417223953.dkr.ecr.us-east-1.amazonaws.com/order-system-repo"
@@ -41,6 +48,8 @@ lambda_dirs=(
   "./apps/functions/inventory-service-handler"    # inventoryServiceFunction
 )
 
+changed_lambdas=()
+
 # Loop over the arrays using indices.
 for i in "${!lambda_names[@]}"; do
   lambda="${lambda_names[$i]}"
@@ -49,6 +58,8 @@ for i in "${!lambda_names[@]}"; do
   CHECKSUM_FILE="./${lambda}.checksum"
   echo "-------------------------------------------------------"
   echo "Checking for changes in $lambda code in $LAMBDA_DIR..."
+
+  
 
   # Compute a combined checksum for all files in the Lambda source directory.
   CURRENT_CHECKSUM=$(find "$LAMBDA_DIR" -type f -exec sha256sum {} \; | sort | sha256sum | awk '{print $1}')
@@ -69,6 +80,7 @@ for i in "${!lambda_names[@]}"; do
 
       # Update the checksum file.
       echo "$CURRENT_CHECKSUM" > "$CHECKSUM_FILE"
+      changed_lambdas+=("${lambda}")
   fi
 done
 
@@ -84,17 +96,24 @@ terraform apply \
 # terraform refresh
 # terraform output module.api.orders_api_endpoint
 
-# Loop over the arrays using indices.
-for i in "${!lambda_names[@]}"; do
-  lambda="${lambda_names[$i]}"
-  LAMBDA_DIR="${lambda_dirs[$i]}"
-  ZIP_FILE="${LAMBDA_DIR}/${lambda}.zip"  # Build path relative to each lambda's directory
-  CHECKSUM_FILE="./${lambda}.checksum"
-    # Update the Lambda function code on AWS.
-    echo "Updating Lambda function code for $lambda..."
-    aws lambda update-function-code --function-name "$lambda" --zip-file fileb://"$ZIP_FILE"
-  else
-      echo "No changes detected for $lambda. Skipping packaging and update."
-  fi
+for fn in "${changed_lambdas[@]}"; do
   echo "-------------------------------------------------------"
+  echo "Looking for ${fn}.zip in $PROJECT_ROOT/apps/functions ..."
+
+  ZIP_FILE=$(find "${PROJECT_ROOT}/apps/functions" -type f -name "${fn}.zip" -print -quit)
+
+  if [[ -z "$ZIP_FILE" ]]; then
+    echo "❌  Could not find ${fn}.zip under ${PROJECT_ROOT}/apps/functions" >&2
+    continue
+  fi
+
+  echo "✔  Found $ZIP_FILE"
+  echo "Updating Lambda function code for $fn..."
+
+  aws lambda update-function-code \
+    --function-name "$fn" \
+    --zip-file "fileb://$ZIP_FILE"
+
+  echo "✔  Updated $fn"
 done
+echo "-------------------------------------------------------"

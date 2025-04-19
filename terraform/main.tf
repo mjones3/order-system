@@ -26,16 +26,19 @@ module "network" {
   }
 }
 
-module "api" {
-  source        = "./modules/api"
-  orders_lb_dns = module.ecs_order_service.order_lb_dns
+module "api-sfn" {
+  source                           = "./modules/api-sfn"
+  aws_sfn_state_machine_order_saga = module.lambda.aws_sfn_state_machine_order_saga
 }
+
+
 
 module "lambda" {
   source                     = "./modules/lambda"
   aws_iam_role_sfn_role_arn  = module.iam.aws_iam_role_sfn_role_arn
   lambda_exec_role_arn       = module.iam.lambda_exec_role_arn
   aws_lambda_assume_role_arn = module.iam.aws_lambda_assume_role_arn
+  api_endpoint_orders        = module.ecs_order_service.order_lb_dns
 }
 
 module "iam" {

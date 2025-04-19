@@ -17,3 +17,10 @@ output "aws_lambda_function_order_callback_service_arn" {
   description = "The ARN of the ECS Task Execution Role"
   value       = aws_lambda_function.order_callback.arn
 }
+
+output "aws_sfn_state_machine_order_saga" {
+  description = "The ARN of the ECS Task Execution Role"
+  value       = aws_sfn_state_machine.order_saga.arn
+}
+
+

@@ -1,13 +1,16 @@
 package com.elusivemel.orderservice.model;
 
+import java.math.BigDecimal;
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.ToString;
-
-import java.math.BigDecimal;
 
 @Entity
 @Table(name = "orders")
@@ -16,42 +19,61 @@ public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
-    private String product;
-    private int quantity;
-    private BigDecimal price;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> items;
 
-    public Long getId() {
+    private BigDecimal total;
+    private String status;
+
+    public Order() {
+    }
+
+    public Order(int id, List<OrderItem> items, BigDecimal total, String status) {
+        this.id = id;
+        this.items = items;
+        this.total = total;
+        this.status = status;
+    }
+
+    public void setOrderItems(List<OrderItem> items) {
+        this.items = items;
+    }
+
+    public void appendItem(OrderItem newItem) {
+        this.items.add(newItem);
+    }
+
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public String getProduct() {
-        return product;
+    public List<OrderItem> getItems() {
+        return items;
     }
 
-    public void setProduct(String product) {
-        this.product = product;
+    public void setItems(List<OrderItem> items) {
+        this.items = items;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public BigDecimal getTotal() {
+        return total;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setTotal(BigDecimal total) {
+        this.total = total;
     }
 
-    public BigDecimal getPrice() {
-        return price;
+    public String getStatus() {
+        return status;
     }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
+    public void setStatus(String status) {
+        this.status = status;
     }
-
 }

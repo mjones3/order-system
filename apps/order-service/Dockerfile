@@ -23,4 +23,4 @@ COPY --from=builder /target/order-service-0.0.1-SNAPSHOT.jar ./order-service.jar
 EXPOSE 8080
 
 # Run the application
-ENTRYPOINT ["java", "-jar", "order-service.jar"]
+ENTRYPOINT ["java", "-Dspring.main.debug=true", "-jar", "order-service.jar"]

@@ -63,6 +63,11 @@ resource "aws_lambda_function" "order_service" {
   runtime       = "python3.9"                      # or your preferred Python version
   role          = var.aws_lambda_assume_role_arn
   filename      = "../apps/functions/order-service-handler/orderServiceFunction.zip" # your deployment package ZIP file
+  environment {
+    variables = {
+      API_ENDPOINT_ORDERS = var.api_endpoint_orders
+    }
+  }
 }
 
 resource "aws_lambda_function" "inventory_service" {
