@@ -3,8 +3,15 @@ package com.elusivemel.orderservice.model;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.elusivemel.orderservice.OrderStatus;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -15,22 +22,32 @@ import lombok.ToString;
 @Entity
 @Table(name = "orders")
 @ToString
+
 public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "order",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
+    )
+    @JsonManagedReference    // ← mark the “forward” side
     private List<OrderItem> items;
 
     private BigDecimal total;
-    private String status;
+
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
 
     public Order() {
+        // this.items = new java.util.ArrayList<>();
     }
 
-    public Order(int id, List<OrderItem> items, BigDecimal total, String status) {
+    public Order(int id, List<OrderItem> items, BigDecimal total, OrderStatus status) {
         this.id = id;
         this.items = items;
         this.total = total;
@@ -41,8 +58,9 @@ public class Order {
         this.items = items;
     }
 
-    public void appendItem(OrderItem newItem) {
-        this.items.add(newItem);
+    public void addItem(OrderItem item) {
+        item.setOrder(this);
+        items.add(item);
     }
 
     public int getId() {
@@ -69,11 +87,12 @@ public class Order {
         this.total = total;
     }
 
-    public String getStatus() {
+    public OrderStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(OrderStatus status) {
         this.status = status;
     }
+
 }

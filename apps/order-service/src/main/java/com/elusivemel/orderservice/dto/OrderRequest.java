@@ -7,18 +7,18 @@ import com.elusivemel.orderservice.model.OrderItem;
 import lombok.ToString;
 
 @ToString
-public class CreateOrderRequest {
+public class OrderRequest {
 
-    public CreateOrderRequest() {
+    public OrderRequest() {
     }
 
-    private List<OrderItem> items;
+    private List<OrderItemRequest> items;
 
-    public List<OrderItem> getItems() {
+    public List<OrderItemRequest> getItems() {
         return items;
     }
 
-    public void setItems(List<OrderItem> items) {
+    public void setItems(List<OrderItemRequest> items) {
         this.items = items;
     }
 }

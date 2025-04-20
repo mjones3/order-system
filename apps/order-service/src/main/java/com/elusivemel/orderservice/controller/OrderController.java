@@ -3,6 +3,8 @@ package com.elusivemel.orderservice.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.crypto.spec.OAEPParameterSpec;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.elusivemel.orderservice.dto.CreateOrderRequest;
+import com.elusivemel.orderservice.OrderStatus;
+import com.elusivemel.orderservice.dto.OrderRequest;
 import com.elusivemel.orderservice.model.Order;
 import com.elusivemel.orderservice.model.OrderItem;
 import com.elusivemel.orderservice.repository.OrderItemRepository;
@@ -48,25 +51,31 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<Order> createOrder(@RequestBody CreateOrderRequest req) {
+    public ResponseEntity<Order> createOrder(@RequestBody OrderRequest req) {
         // log the incoming items
         logger.info("Creating order for items: {}", req.getItems());
-        Order order = new Order();
+        Order order = orderRepository.save(new Order());
 
         List<OrderItem> savedOrderItems = (List<OrderItem>) req.getItems().stream()
                 .map(itemReq -> {
                     // Convert DTO → Entity
-                    OrderItem o = new OrderItem();
-                    o.setProductId(itemReq.getProductId());
-                    o.setQuantity(itemReq.getQuantity());
-                    order.appendItem(o);
+                    OrderItem item = new OrderItem();
+                    item.setOrder(order);
+                    item.setProductId(itemReq.getProductId());
+                    item.setQuantity(itemReq.getQuantity());
+
                     // Persist  return the managed entity
-                    return orderItemRepository.save(o);
+                    return orderItemRepository.save(item);
                 })
                 .collect(Collectors.toList());
 
+        logger.info("Items to add to order: {}", savedOrderItems);
+
         order.setItems(savedOrderItems);
-        Order savedOrder = orderRepository.save(order);
-        return new ResponseEntity<>(savedOrder, HttpStatus.CREATED);
+        order.setStatus(OrderStatus.PENDING);
+        Order saved = orderRepository.save(order);
+
+        logger.info("Order saved: {}", saved);
+        return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
 }

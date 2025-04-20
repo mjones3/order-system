@@ -19,3 +19,5 @@ buildNumber.properties
 .DS_Store
 Thumbs.db
 
+apps/order-service/.mvn/wrapper/maven-wrapper.properties
+apps/order-service/.mvn/wrapper/MavenWrapperDownloader.java
