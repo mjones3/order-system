@@ -2,6 +2,10 @@
 resource "aws_apigatewayv2_api" "orders_api" {
   name          = "orders-api"
   protocol_type = "HTTP"
+  tags = {
+    Environment = "dev"
+    Project     = "order-system"
+  }
 }
 
 # Create an integration that proxies requests to the load balancer.
@@ -51,6 +55,7 @@ resource "aws_cloudwatch_log_group" "apigw_logs" {
 
   tags = {
     Environment = "dev"
+    Project     = "order-system"
   }
 }
 

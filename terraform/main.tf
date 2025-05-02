@@ -39,6 +39,8 @@ module "lambda" {
   lambda_exec_role_arn       = module.iam.lambda_exec_role_arn
   aws_lambda_assume_role_arn = module.iam.aws_lambda_assume_role_arn
   api_endpoint_orders        = module.ecs_order_service.order_lb_dns
+  api_endpoint_inventory     = module.ecs_inventory_service.inventory_lb_dns
+  
 }
 
 module "iam" {

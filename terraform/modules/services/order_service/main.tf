@@ -94,7 +94,8 @@ resource "aws_security_group" "ecs_task_sg" {
   # You can define inbound rules if your application requires them.
 
   tags = {
-    Name = "ecs-task-sg"
+    Environment = "dev"
+    Project     = "order-system"
   }
 }
 
@@ -120,6 +121,11 @@ resource "aws_security_group" "lb_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    Environment = "dev"
+    Project     = "order-system"
+  }
 }
 
 # Create the Application Load Balancer (ALB)
@@ -131,6 +137,7 @@ resource "aws_lb" "order_lb" {
 
   tags = {
     Environment = "dev"
+    Project     = "order-system"
   }
 }
 
@@ -154,6 +161,7 @@ resource "aws_lb_target_group" "order_tg" {
 
   tags = {
     Environment = "dev"
+    Project     = "order-system"
   }
 }
 
@@ -168,11 +176,18 @@ resource "aws_lb_listener" "order_listener" {
     target_group_arn = aws_lb_target_group.order_tg.arn
 
   }
+  tags = {
+    Environment = "dev"
+    Project     = "order-system"
+  }
 
 }
 
 resource "aws_cloudwatch_log_group" "ecs_app_log_group" {
   name              = "/ecs/order-service"
   retention_in_days = 30
-
+  tags = {
+    Environment = "dev"
+    Project     = "order-system"
+  }
 }

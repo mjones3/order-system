@@ -31,7 +31,7 @@ module "ecr_repo" {
   })
 
   tags = {
-    Terraform   = "true"
     Environment = "dev"
+    Project     = "order-system"
   }
 }

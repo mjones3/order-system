@@ -16,11 +16,18 @@ resource "aws_ecs_service" "inventory_service" {
     target_group_arn = aws_lb_target_group.inventory_tg.arn
     container_name   = "inventory-container"
     container_port   = 8080
+
+
   }
 
   depends_on = [
     aws_lb_listener.inventory_listener # Ensure listener exists first
   ]
+
+  tags = {
+    Environment = "dev"
+    Project     = "order-system"
+  }
 }
 
 resource "aws_ecs_task_definition" "inventory_service" {
@@ -73,6 +80,11 @@ resource "aws_ecs_task_definition" "inventory_service" {
       }
     }
   ])
+
+  tags = {
+    Environment = "dev"
+    Project     = "order-system"
+  }
 }
 
 resource "aws_security_group" "ecs_task_sg_inventory" {
@@ -94,7 +106,8 @@ resource "aws_security_group" "ecs_task_sg_inventory" {
   # You can define inbound rules if your application requires them.
 
   tags = {
-    Name = "ecs-task-sg"
+    Environment = "dev"
+    Project     = "order-system"
   }
 }
 
@@ -131,6 +144,7 @@ resource "aws_lb" "inventory_lb" {
 
   tags = {
     Environment = "dev"
+    Project     = "order-system"
   }
 }
 
@@ -154,6 +168,7 @@ resource "aws_lb_target_group" "inventory_tg" {
 
   tags = {
     Environment = "dev"
+    Project     = "order-system"
   }
 }
 

@@ -54,6 +54,10 @@ resource "aws_sfn_state_machine" "order_saga" {
   }
 }
 EOF
+  tags = {
+    Environment = "dev"
+    Project     = "order-system"
+  }
 }
 
 
@@ -68,6 +72,10 @@ resource "aws_lambda_function" "order_service" {
       API_ENDPOINT_ORDERS = var.api_endpoint_orders
     }
   }
+  tags = {
+    Environment = "dev"
+    Project     = "order-system"
+  }
 }
 
 resource "aws_lambda_function" "inventory_service" {
@@ -76,6 +84,16 @@ resource "aws_lambda_function" "inventory_service" {
   runtime       = "python3.9"                      # or your preferred Python version
   role          = var.aws_lambda_assume_role_arn
   filename      = "../apps/functions/inventory-service-handler/inventoryServiceFunction.zip" # your deployment package ZIP file
+
+  environment {
+    variables = {
+      API_ENDPOINT_INVENTORY = var.api_endpoint_inventory
+    }
+  }
+  tags = {
+    Environment = "dev"
+    Project     = "order-system"
+  }
 }
 
 resource "aws_lambda_function" "order_callback" {
@@ -84,6 +102,10 @@ resource "aws_lambda_function" "order_callback" {
   runtime       = "python3.9"                      # or your preferred Python version
   role          = var.aws_lambda_assume_role_arn
   filename      = "../apps/functions/order-callback/orderCallbackFunction.zip" # your deployment package ZIP file
+  tags = {
+    Environment = "dev"
+    Project     = "order-system"
+  }
 }
 
 resource "aws_lambda_function" "email_service" {
@@ -92,4 +114,8 @@ resource "aws_lambda_function" "email_service" {
   runtime       = "python3.9"                      # or your preferred Python version
   role          = var.aws_lambda_assume_role_arn
   filename      = "../apps/functions/email-service/emailServiceFunction.zip" # your deployment package ZIP file
+  tags = {
+    Environment = "dev"
+    Project     = "order-system"
+  }
 }

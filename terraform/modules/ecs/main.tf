@@ -1,6 +1,10 @@
 
 resource "aws_ecs_cluster" "fargate_cluster" {
   name = "order-system-fargate-cluster"
+  tags = {
+    Environment = "dev"
+    Project     = "order-system"
+  }
 }
 
 # resource "aws_security_group" "vpc_endpoint_sg" {

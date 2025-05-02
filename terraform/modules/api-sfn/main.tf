@@ -11,6 +11,11 @@ resource "aws_iam_role" "apigw_sfn_role" {
       Action    = "sts:AssumeRole"
     }]
   })
+
+  tags = {
+    Environment = "dev"
+    Project     = "order-system"
+  }
 }
 
 # 2) Grant that role permission to start your state machine
@@ -26,12 +31,17 @@ resource "aws_iam_role_policy" "apigw_sfn_policy" {
       Resource = [var.aws_sfn_state_machine_order_saga]
     }]
   })
+
 }
 
 # 3) Create the HTTP API
 resource "aws_apigatewayv2_api" "orders_api" {
   name          = "orders-saga-api"
   protocol_type = "HTTP"
+  tags = {
+    Environment = "dev"
+    Project     = "order-system"
+  }
 }
 
 # 4) Integration pointing at Step Functions StartExecution action

@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.elusivemel.orderservice.OrderStatus;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -44,7 +44,6 @@ public class Order {
     private OrderStatus status;
 
     public Order() {
-        // this.items = new java.util.ArrayList<>();
     }
 
     public Order(int id, List<OrderItem> items, BigDecimal total, OrderStatus status) {
@@ -63,6 +62,7 @@ public class Order {
         items.add(item);
     }
 
+    @JsonProperty("orderId")
     public int getId() {
         return id;
     }

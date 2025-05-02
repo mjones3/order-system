@@ -12,3 +12,7 @@ variable "aws_lambda_assume_role_arn" {
 variable "api_endpoint_orders" {
   type = string
 }
+
+variable "api_endpoint_inventory" {
+  type = string
+}

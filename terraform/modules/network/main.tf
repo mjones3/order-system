@@ -4,13 +4,10 @@
 #
 resource "aws_vpc" "this" {
   cidr_block = var.vpc_cidr
-
-  tags = merge(
-    var.tags,
-    {
-      Name = "order-system-vpc"
-    }
-  )
+  tags = {
+    Environment = "dev"
+    Project     = "order-system"
+  }
 }
 
 #
@@ -22,12 +19,10 @@ resource "aws_subnet" "public" {
   cidr_block        = var.public_subnet[count.index]
   availability_zone = element(data.aws_availability_zones.available.names, count.index)
 
-  tags = merge(
-    var.tags,
-    {
-      Name = "order-system-public-subnet-${count.index}"
-    }
-  )
+  tags = {
+    Environment = "dev"
+    Project     = "order-system"
+  }
 }
 
 
@@ -39,23 +34,18 @@ resource "aws_route_table" "public" {
     gateway_id = aws_internet_gateway.this.id
   }
 
-  tags = merge(
-    var.tags,
-    {
-      Name = "order-system-public-rt"
-    }
-  )
+  tags = {
+    Environment = "dev"
+    Project     = "order-system"
+  }
 }
 
 resource "aws_internet_gateway" "this" {
   vpc_id = aws_vpc.this.id
-
-  tags = merge(
-    var.tags,
-    {
-      Name = "order-igw"
-    }
-  )
+  tags = {
+    Environment = "dev"
+    Project     = "order-system"
+  }
 }
 
 # # Allocate an Elastic IP for the NAT Gateway
@@ -69,7 +59,8 @@ resource "aws_nat_gateway" "nat" {
   subnet_id     = aws_subnet.public[0].id
 
   tags = {
-    Name = "my-nat-gateway"
+    Environment = "dev"
+    Project     = "order-system"
   }
 }
 
@@ -82,9 +73,9 @@ resource "aws_route_table" "private_rt" {
     cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.nat.id
   }
-
   tags = {
-    Name = "private-rt"
+    Environment = "dev"
+    Project     = "order-system"
   }
 }
 
@@ -103,6 +94,7 @@ resource "aws_route_table_association" "public_association" {
   count          = length(var.public_subnet)
   subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
+
 }
 
 
@@ -114,7 +106,8 @@ resource "aws_subnet" "private" {
   map_public_ip_on_launch = false
 
   tags = {
-    Name = "order-system-private-subnet-${count.index}"
+    Environment = "dev"
+    Project     = "order-system"
   }
 }
 
@@ -122,13 +115,19 @@ resource "aws_subnet" "private" {
 resource "aws_db_subnet_group" "order_db_subnet_group" {
   name       = "order-system-db-subnet-group"
   subnet_ids = aws_subnet.private[*].id # List of subnet IDs in your VPC that you want to use for your DB
-  tags       = var.tags
+  tags = {
+    Environment = "dev"
+    Project     = "order-system"
+  }
 }
 
 resource "aws_db_subnet_group" "inventory_db_subnet_group" {
   name       = "inventory-system-db-subnet-group"
   subnet_ids = aws_subnet.private[*].id # List of subnet IDs in your VPC that you want to use for your DB
-  tags       = var.tags
+  tags = {
+    Environment = "dev"
+    Project     = "order-system"
+  }
 }
 
 resource "aws_security_group" "postgresql-sg" {
@@ -153,7 +152,8 @@ resource "aws_security_group" "postgresql-sg" {
   }
 
   tags = {
-    Name = "postgresql-sg"
+    Environment = "dev"
+    Project     = "order-system"
   }
 }
 
@@ -180,7 +180,8 @@ resource "aws_security_group" "fargate_sg" {
   }
 
   tags = {
-    Name = "fargate-sg"
+    Environment = "dev"
+    Project     = "order-system"
   }
 }
 
@@ -210,8 +211,8 @@ resource "aws_security_group" "vpc_endpoint_sg" {
   }
 
   tags = {
-    Terraform   = "true"
     Environment = "dev"
+    Project     = "order-system"
   }
 }
 

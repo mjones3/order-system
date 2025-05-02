@@ -1,5 +1,7 @@
 package com.elusivemel.inventoryservice.model;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -8,7 +10,7 @@ import jakarta.persistence.Table;
 import lombok.ToString;
 
 @Entity
-@Table(name = "orders")
+@Table(name = "inventory")
 @ToString
 public class Inventory {
 
@@ -16,15 +18,17 @@ public class Inventory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long productId;
+    private String productId;
 
     private int remainingQuantity;
 
-    public Long getProductId() {
+    private BigDecimal price;
+
+    public String getProductId() {
         return productId;
     }
 
-    public void setProductId(Long productId) {
+    public void setProductId(String productId) {
         this.productId = productId;
     }
 
@@ -34,6 +38,22 @@ public class Inventory {
 
     public void setRemainingQuantityuantity(int remainingQuantity) {
         this.remainingQuantity = remainingQuantity;
+    }
+
+    public int getRemainingQuantity() {
+        return remainingQuantity;
+    }
+
+    public void setRemainingQuantity(int remainingQuantity) {
+        this.remainingQuantity = remainingQuantity;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
 }

@@ -3,8 +3,6 @@ package com.elusivemel.orderservice.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.crypto.spec.OAEPParameterSpec;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.elusivemel.orderservice.OrderStatus;
 import com.elusivemel.orderservice.dto.OrderRequest;
+import com.elusivemel.orderservice.dto.OrderResponse;
 import com.elusivemel.orderservice.model.Order;
 import com.elusivemel.orderservice.model.OrderItem;
 import com.elusivemel.orderservice.repository.OrderItemRepository;
@@ -51,16 +50,20 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<Order> createOrder(@RequestBody OrderRequest req) {
+    public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderRequest req) {
         // log the incoming items
         logger.info("Creating order for items: {}", req.getItems());
-        Order order = orderRepository.save(new Order());
+        Order order = new Order();
+        order.setStatus(OrderStatus.PENDING);
+
+        Order savedOrder = orderRepository.save(order);
+        logger.info("Order saved: {}", savedOrder);
 
         List<OrderItem> savedOrderItems = (List<OrderItem>) req.getItems().stream()
                 .map(itemReq -> {
                     // Convert DTO → Entity
                     OrderItem item = new OrderItem();
-                    item.setOrder(order);
+                    item.setOrder(savedOrder);
                     item.setProductId(itemReq.getProductId());
                     item.setQuantity(itemReq.getQuantity());
 
@@ -72,10 +75,10 @@ public class OrderController {
         logger.info("Items to add to order: {}", savedOrderItems);
 
         order.setItems(savedOrderItems);
-        order.setStatus(OrderStatus.PENDING);
-        Order saved = orderRepository.save(order);
+        // order.setStatus(OrderStatus.PENDING);
 
-        logger.info("Order saved: {}", saved);
-        return new ResponseEntity<>(saved, HttpStatus.CREATED);
+        OrderResponse response = new OrderResponse(order);
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }

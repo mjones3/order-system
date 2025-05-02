@@ -1,0 +1,9 @@
+com/elusivemel/inventoryservice/util/InventoryUtil.class
+com/elusivemel/inventoryservice/model/Inventory.class
+com/elusivemel/inventoryservice/dto/InventoryResponse.class
+com/elusivemel/inventoryservice/dto/InventoryResponseItem.class
+com/elusivemel/inventoryservice/repository/InventoryRepository.class
+com/elusivemel/inventoryservice/InventoryServiceApplication.class
+com/elusivemel/inventoryservice/dto/InventoryRequest.class
+com/elusivemel/inventoryservice/dto/InventoryRequestItem.class
+com/elusivemel/inventoryservice/controller/InventoryController.class
