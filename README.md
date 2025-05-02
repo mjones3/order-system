@@ -1,4 +1,4 @@
-# order-system
+# Saga Pattern Demonstration: Order System in AWS
 
 This is a demonstration of the Saga pattern at work with an example ordering system.  It uses a flow defined by AWS Step Functions and calls Java Spring Boot microservices, each with its own PostgreSQL datastore. 
 
