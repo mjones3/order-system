@@ -16,3 +16,8 @@ variable "api_endpoint_orders" {
 variable "api_endpoint_inventory" {
   type = string
 }
+
+variable "api_endpoint_payment" {
+  type = string
+}
+

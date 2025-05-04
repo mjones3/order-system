@@ -34,6 +34,11 @@ output "inventory_db_subnet_group" {
   value       = aws_db_subnet_group.order_db_subnet_group
 }
 
+output "payment_db_subnet_group" {
+  description = "Private subnet group"
+  value       = aws_db_subnet_group.order_db_subnet_group
+}
+
 output "private_subnets" {
   description = "List of private subnet IDs for the VPC"
   value       = aws_subnet.private[*].id

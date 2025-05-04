@@ -1,5 +1,6 @@
 package com.elusivemel.inventoryservice.controller;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,6 +46,7 @@ public class InventoryController {
             List<InventoryResponseItem> responseItemsList;
             responseItemsList = items.stream()
                     .map(i -> {
+
                         Inventory inventoryItem = inventoryRepository.findByProductId(i.getProductId())
                                 .orElseThrow(() -> new EntityNotFoundException(
                                 "No inventory for product " + i.getProductId()));
@@ -77,6 +79,16 @@ public class InventoryController {
             response.setItems(responseItemsList);
             response.setOrderId(inventoryRequest.getOrderId());
 
+            BigDecimal total = responseItemsList.stream()
+                    .filter(item -> item.getPrice() != null && item.getAvailableQuantity() > 0)
+                    .map(item
+                            -> item.getPrice()
+                            .multiply(BigDecimal.valueOf(item.getAvailableQuantity()
+                            ))
+                    )
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            response.setTotal(total);
             logger.info("Inventory response: {}", response);
 
         } catch (EntityNotFoundException entityNotFoundException) {

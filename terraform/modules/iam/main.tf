@@ -104,9 +104,7 @@ resource "aws_iam_role_policy" "sfn_policy" {
         Resource = [
           var.aws_lambda_function_order_service_arn,
           var.aws_lambda_function_inventory_service_arn,
-          var.aws_lambda_function_order_callback_service_arn,
-          var.aws_lambda_function_email_service_arn,
-
+          var.aws_lambda_function_payment_service_arn,
 
         ]
       }

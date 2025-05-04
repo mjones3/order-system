@@ -1,4 +1,4 @@
-package com.elusivemel.inventoryservice.dto;
+package com.elusivemel.paymentservice.dto;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -7,23 +7,23 @@ import java.util.List;
 import lombok.ToString;
 
 @ToString
-public class InventoryResponse {
+public class PaymentRequest {
 
     private long orderId;
 
-    private List<InventoryResponseItem> items;
+    private List<PaymentRequestItems> items;
 
     private BigDecimal total;
 
-    public InventoryResponse() {
+    public PaymentRequest() {
         this.items = new ArrayList<>();
     }
 
-    public List<InventoryResponseItem> getItems() {
+    public List<PaymentRequestItems> getItems() {
         return items;
     }
 
-    public void setItems(List<InventoryResponseItem> items) {
+    public void setItems(List<PaymentRequestItems> items) {
         this.items = items;
     }
 
@@ -42,7 +42,5 @@ public class InventoryResponse {
     public void setTotal(BigDecimal total) {
         this.total = total;
     }
-
-
 
 }

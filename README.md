@@ -4,7 +4,7 @@ This is a demonstration of the Saga pattern at work with an example ordering sys
 
 1) The order lambda takes an order request from the user, creates an order using the Order Service and checks inventory to see if there is enough of each item to fufill an order.  
 2) The inventory lambda decrements inventory to fufill the order then performs a callback on the Order Service with the items and prices for the order 
-43) the payment service is called.  If there is an error processing the payment, a delta is performed on the order and inventory services to roll back the transaction. 
+3) The payment service is called.  If there is an error processing the payment, a delta is performed on the order and inventory services to roll back the transaction. 
 
 
 ![Architecture Diagram](images/ordersystem.png)

@@ -9,7 +9,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 # This env var must be configured in your Lambda’s settings
-API_ENDPOINT = os.environ["API_ENDPOINT_ORDERS"]  
+API_ENDPOINT = os.environ["API_ENDPOINT_PAYMENT"]  
 
 
 def lambda_handler(event, context):
@@ -19,32 +19,42 @@ def lambda_handler(event, context):
     or directly:
       [ {"itemNumber":"A1","quantity":2}, ... ]
     """
-    logger.info("--------")
-    logger.info("Received event: %s", event)
-    input = event["input"]
-    payload_list = input["items"]
+    # logger.info("--------")
+    # logger.info("Received event: %s", event)
+    # input = event["input"]
+    # payload_list = input["items"]
 
     # Normalize payload
-    if isinstance(event, dict) and "items" in input:
-        payload_list = input["items"]
-        logger.info("payload_list: %s", payload_list)
-    elif isinstance(event, list):
-        payload_list = event
-    else:
-        # Unexpected shape
-        msg = "Event must be a list or dict with 'items' key"
-        logger.error(msg)
-        return {"statusCode":400, "body": msg}
+    # if isinstance(event, dict) and "items" in input:
+    #     payload_list = input["items"]
+    #     logger.info("payload_list: %s", payload_list)
+    # elif isinstance(event, list):
+    #     payload_list = event
+    # else:
+    #     # Unexpected shape
+    #     msg = "Event must be a list or dict with 'items' key"
+    #     logger.error(msg)
+    #     return {"statusCode":400, "body": msg}
 
-    # Wrap in an object if your downstream expects it
-    body_dict = {"items": payload_list}
-    body_bytes = json.dumps(body_dict).encode("utf-8")
+    # # Wrap in an object if your downstream expects it
+    # body_dict = {"items": payload_list}
 
-    url = "http://" + API_ENDPOINT + "/api/orders/create"
+    # 1) Drill into the nested keys to get the raw JSON string
+
+    body_str = event['input']['Payload']['body']
+
+    # 2) Parse it into a Python dict (null → None, numbers → int/float, etc.)
+    parsed_body = json.loads(body_str)
+
+
+    url = "http://" + API_ENDPOINT + "/api/payments"
+
+    json_bytes = json.dumps(parsed_body).encode("utf-8")
+
     logger.info("Sending request to: %s", url)
     req = urllib.request.Request(
         url,
-        data=body_bytes,
+        data=json_bytes,
         headers={"Content-Type": "application/json"},
         method="POST"
     )

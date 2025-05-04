@@ -21,8 +21,10 @@ import com.elusivemel.orderservice.model.OrderItem;
 import com.elusivemel.orderservice.repository.OrderItemRepository;
 import com.elusivemel.orderservice.repository.OrderRepository;
 
+import lombok.experimental.PackagePrivate;
+
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("/api")
 public class OrderController {
 
     private static final Logger logger = LogManager.getLogger(OrderController.class);
@@ -49,7 +51,7 @@ public class OrderController {
     public OrderController() {
     }
 
-    @PostMapping
+    @PostMapping("/orders/create")
     public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderRequest req) {
         // log the incoming items
         logger.info("Creating order for items: {}", req.getItems());
@@ -81,4 +83,5 @@ public class OrderController {
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
 }
