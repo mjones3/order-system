@@ -62,7 +62,7 @@ public class InventoryController {
                                     i.getProductId(), i.getDesiredQuantity(), inventoryItem.getQuantity());
 
                             inventoryItem.setRemainingQuantity(inventoryItem.getQuantity() - i.getDesiredQuantity());
-                            responseItem.setAvailableQuantity(inventoryItem.getQuantity() - i.getDesiredQuantity());
+                            responseItem.setAvailableQuantity(inventoryItem.getRemainingQuantity());
                             inventoryRepository.save(inventoryItem);
                         } else {
                             logger.error("Not enough inventory for product {} with desired quantity {} and available quantity {}",

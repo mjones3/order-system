@@ -11,22 +11,22 @@ import lombok.ToString;
 @ToString
 class OrderResponseItem {
 
-    private int id;
+    private int orderItemId;
     private String productId;
-    private int quantity;
+    private int desiredQuantity;
 
     public OrderResponseItem(OrderItem item) {
-        this.id = item.getId().intValue();
+        this.orderItemId = item.getId().intValue();
         this.productId = item.getProductId();
-        this.quantity = item.getQuantity();
+        this.desiredQuantity = item.getQuantity();
     }
 
-    public int getId() {
-        return id;
+    public int getOrderItemId() {
+        return orderItemId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setOrderItemId(int orderItemId) {
+        this.orderItemId = orderItemId;
     }
 
     public String getProductId() {
@@ -37,12 +37,12 @@ class OrderResponseItem {
         this.productId = productId;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public int getDesiredQuantity() {
+        return desiredQuantity;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setQuantity(int desiredQuantity) {
+        this.desiredQuantity = desiredQuantity;
     }
 
 }
