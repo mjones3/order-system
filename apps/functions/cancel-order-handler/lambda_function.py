@@ -9,7 +9,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 # This env var must be configured in your Lambda’s settings
-API_ENDPOINT = os.environ["API_ENDPOINT_INVENTORY"]  
+API_ENDPOINT = os.environ["API_ENDPOINT_CANCEL_ORDER"]  
 
 
 def lambda_handler(event, context):
@@ -42,12 +42,13 @@ def lambda_handler(event, context):
     # 1) Drill into the nested keys to get the raw JSON string
 
     body_str = event['input']['Payload']['body']
+    order_id = event['input']['Payload']['body']['orderId']
 
     # 2) Parse it into a Python dict (null → None, numbers → int/float, etc.)
     parsed_body = json.loads(body_str)
 
 
-    url = "http://" + API_ENDPOINT + "/api/inventory"
+    url = "http://" + API_ENDPOINT + "/api/payments/" + order_id + "/refund"
 
     json_bytes = json.dumps(parsed_body).encode("utf-8")
 

@@ -19,8 +19,8 @@ def lambda_handler(event, context):
     or directly:
       [ {"itemNumber":"A1","quantity":2}, ... ]
     """
-    # logger.info("--------")
-    # logger.info("Received event: %s", event)
+    logger.info("--------")
+    logger.info("Received event: %s", event)
     # input = event["input"]
     # payload_list = input["items"]
 

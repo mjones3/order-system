@@ -18,6 +18,7 @@ resource "aws_sfn_state_machine" "order_saga" {
       },
       "Next": "InventoryService"
     },
+
     "InventoryService": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
@@ -27,13 +28,50 @@ resource "aws_sfn_state_machine" "order_saga" {
           "input.$": "$"
         }
       },
+      "Catch": [
+        {
+          "ErrorEquals": ["NotFound", "HTTPError404"],
+          "Next": "CancelOrder"
+        }
+      ],
       "Next": "PaymentService"
     },
-      "PaymentService": {
+
+    "PaymentService": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
         "FunctionName": "${aws_lambda_function.payment_service.arn}",
+        "Payload": {
+          "input.$": "$"
+        }
+      },
+      "Catch": [
+        {
+          "ErrorEquals": ["PaymentFailed", "HTTPError402"],
+          "Next": "ReleaseInventory"
+        }
+      ],
+      "End": true
+    },
+
+    "ReleaseInventory": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${aws_lambda_function.release_inventory.arn}",
+        "Payload": {
+          "input.$": "$"
+        }
+      },
+      "Next": "CancelOrder"
+    },
+
+    "CancelOrder": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${aws_lambda_function.cancel_order.arn}",
         "Payload": {
           "input.$": "$"
         }
@@ -100,3 +138,31 @@ resource "aws_lambda_function" "payment_service" {
   }
 }
 
+resource "aws_lambda_function" "release_inventory" {
+  function_name = "releaseInventoryFunction"
+  handler       = "lambda_function.lambda_handler" # file name . function name
+  runtime       = "python3.9"                      # or your preferred Python version
+  role          = var.aws_lambda_assume_role_arn
+  filename      = "../apps/functions/release-inventory-handler/releaseInventoryFunction.zip" # your deployment package ZIP file
+
+  environment {
+    variables = {
+      API_ENDPOINT_PAYMENT = var.api_endpoint_release_inventory
+    }
+  }
+}
+
+
+resource "aws_lambda_function" "cancel_order" {
+  function_name = "cancelOrderFunction"
+  handler       = "lambda_function.lambda_handler" # file name . function name
+  runtime       = "python3.9"                      # or your preferred Python version
+  role          = var.aws_lambda_assume_role_arn
+  filename      = "../apps/functions/cancel-order-handler/cancelOrderFunction.zip" # your deployment package ZIP file
+
+  environment {
+    variables = {
+      API_ENDPOINT_PAYMENT = var.api_endpoint_cancel_order
+    }
+  }
+}

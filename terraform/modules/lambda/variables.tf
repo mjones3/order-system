@@ -21,3 +21,10 @@ variable "api_endpoint_payment" {
   type = string
 }
 
+variable "api_endpoint_release_inventory" {
+  type = string
+}
+
+variable "api_endpoint_cancel_order" {
+  type = string
+}

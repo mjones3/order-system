@@ -105,6 +105,8 @@ resource "aws_iam_role_policy" "sfn_policy" {
           var.aws_lambda_function_order_service_arn,
           var.aws_lambda_function_inventory_service_arn,
           var.aws_lambda_function_payment_service_arn,
+          var.aws_lambda_function_release_inventory_arn,
+          var.aws_lambda_function_cancel_order_arn,
 
         ]
       }

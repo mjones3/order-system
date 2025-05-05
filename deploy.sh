@@ -40,11 +40,13 @@ done
 #lambdas
 
 # Define parallel arrays: one for Lambda function names and one for their corresponding source directories (where the ZIP file is located)
-lambda_names=("orderServiceFunction" "inventoryServiceFunction" "paymentServiceFunction")
+lambda_names=("orderServiceFunction" "inventoryServiceFunction" "paymentServiceFunction" "cancelOrderFunction" "releaseInventoryFunction")
 lambda_dirs=(
   "./apps/functions/order-service-handler"    # orderServiceFunction ZIP is in this folder
   "./apps/functions/inventory-service-handler"    # inventoryServiceFunction
   "./apps/functions/payment-service-handler"    # paymentServiceFunction
+  "./apps/functions/cancel-order-handler"    # cancelOrderFunction
+  "./apps/functions/release-inventory-handler"    # releaseInventoryFunction
 )
 
 changed_lambdas=()

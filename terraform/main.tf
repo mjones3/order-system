@@ -34,13 +34,15 @@ module "api-sfn" {
 
 
 module "lambda" {
-  source                     = "./modules/lambda"
-  aws_iam_role_sfn_role_arn  = module.iam.aws_iam_role_sfn_role_arn
-  lambda_exec_role_arn       = module.iam.lambda_exec_role_arn
-  aws_lambda_assume_role_arn = module.iam.aws_lambda_assume_role_arn
-  api_endpoint_orders        = module.ecs_order_service.order_lb_dns
-  api_endpoint_inventory     = module.ecs_inventory_service.inventory_lb_dns
-  api_endpoint_payment       = module.ecs_payment_service.payment_lb_dns
+  source                         = "./modules/lambda"
+  aws_iam_role_sfn_role_arn      = module.iam.aws_iam_role_sfn_role_arn
+  lambda_exec_role_arn           = module.iam.lambda_exec_role_arn
+  aws_lambda_assume_role_arn     = module.iam.aws_lambda_assume_role_arn
+  api_endpoint_orders            = module.ecs_order_service.order_lb_dns
+  api_endpoint_inventory         = module.ecs_inventory_service.inventory_lb_dns
+  api_endpoint_payment           = module.ecs_payment_service.payment_lb_dns
+  api_endpoint_cancel_order      = module.ecs_order_service.order_lb_dns
+  api_endpoint_release_inventory = module.ecs_inventory_service.inventory_lb_dns
 
 }
 
@@ -49,6 +51,8 @@ module "iam" {
   aws_lambda_function_order_service_arn     = module.lambda.aws_lambda_function_order_service_arn
   aws_lambda_function_inventory_service_arn = module.lambda.aws_lambda_function_inventory_service_arn
   aws_lambda_function_payment_service_arn   = module.lambda.aws_lambda_function_payment_service_arn
+  aws_lambda_function_cancel_order_arn      = module.lambda.aws_lambda_function_cancel_order_arn
+  aws_lambda_function_release_inventory_arn = module.lambda.aws_lambda_function_release_inventory_arn
 }
 
 module "sqs" {
