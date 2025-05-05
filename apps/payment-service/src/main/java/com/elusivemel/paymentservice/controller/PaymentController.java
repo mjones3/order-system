@@ -5,7 +5,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponseException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,8 +39,8 @@ public class PaymentController {
 
         String approval = ApprovalSelector.pickOneThirdAsString(PaymentStatus.APPROVED, PaymentStatus.DECLINED);
 
-        payment.setTotal(paymentRequest.getTotal());
         payment.setOrderId(paymentRequest.getOrderId());
+        payment.setTotal(paymentRequest.getTotal());
         payment.setStatus(approval);
 
         Payment savedPayment = paymentRepository.save(payment);
@@ -50,13 +49,12 @@ public class PaymentController {
 
         if (savedPayment.getStatus().equals(PaymentStatus.DECLINED.getValue())) {
             logger.info("Payment for orderId = {} not approved.", savedPayment.getOrderId());
-            throw new ErrorResponseException(HttpStatus.PAYMENT_REQUIRED);
+            return new ResponseEntity<>(response, HttpStatus.PAYMENT_REQUIRED);
 
         } else {
             logger.info("Payment response: {}", response);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
-
     }
 
 }

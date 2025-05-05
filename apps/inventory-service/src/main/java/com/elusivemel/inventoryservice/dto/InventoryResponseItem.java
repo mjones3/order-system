@@ -12,6 +12,16 @@ public class InventoryResponseItem {
     private int availableQuantity;
     private BigDecimal price;
 
+    public InventoryResponseItem(InventoryRequestItem requestItem) {
+        this.orderItemId = requestItem.getOrderItemId();
+        this.availableQuantity = requestItem.getDesiredQuantity();
+        this.productId = requestItem.getProductId();
+        this.price = new BigDecimal(0);
+    }
+
+    public InventoryResponseItem() {
+    }
+
     public long getOrderItemId() {
         return orderItemId;
     }

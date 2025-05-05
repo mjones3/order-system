@@ -2,6 +2,7 @@ package com.elusivemel.inventoryservice.controller;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -39,12 +40,20 @@ public class InventoryController {
 
     @PostMapping
     public ResponseEntity<InventoryResponse> checkInventory(@RequestBody InventoryRequest inventoryRequest) {
-        List<InventoryRequestItem> items = inventoryRequest.getItems();
+        List<InventoryRequestItem> inventoryRequestItems = inventoryRequest.getItems();
+
+        List<InventoryResponseItem> responseItemsList = inventoryRequestItems.stream()
+                .map(InventoryResponseItem::new)
+                .collect(Collectors.toList());
+
         InventoryResponse response = new InventoryResponse();
+        response.setOrderId(inventoryRequest.getOrderId());
+        response.setItems(responseItemsList);
+        response.setTotal(new BigDecimal(0));
 
         try {
-            List<InventoryResponseItem> responseItemsList;
-            responseItemsList = items.stream()
+
+            responseItemsList = inventoryRequestItems.stream()
                     .map(i -> {
 
                         Inventory inventoryItem = inventoryRepository.findByProductId(i.getProductId())
@@ -79,13 +88,20 @@ public class InventoryController {
             response.setItems(responseItemsList);
             response.setOrderId(inventoryRequest.getOrderId());
 
-            BigDecimal total = responseItemsList.stream()
-                    .filter(item -> item.getPrice() != null && item.getAvailableQuantity() > 0)
-                    .map(item
-                            -> item.getPrice()
-                            .multiply(BigDecimal.valueOf(item.getAvailableQuantity()
-                            ))
-                    )
+            Map<String, BigDecimal> priceByProductId = responseItemsList.stream()
+                    .filter(r -> r.getPrice() != null)
+                    .collect(Collectors.toMap(
+                            InventoryResponseItem::getProductId,
+                            InventoryResponseItem::getPrice
+                    ));
+
+            BigDecimal total = inventoryRequestItems.stream()
+                    .filter(req -> priceByProductId.containsKey(req.getProductId()))
+                    .map(req -> {
+                        BigDecimal price = priceByProductId.get(req.getProductId());
+                        BigDecimal quantity = BigDecimal.valueOf(req.getDesiredQuantity());
+                        return price.multiply(quantity);
+                    })
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
             response.setTotal(total);
@@ -93,7 +109,7 @@ public class InventoryController {
 
         } catch (EntityNotFoundException entityNotFoundException) {
             logger.error("Error: {}", entityNotFoundException.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
 
         return new ResponseEntity<>(response, HttpStatus.OK);
