@@ -3,6 +3,7 @@ package com.elusivemel.inventoryservice.service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -34,16 +35,11 @@ public class InventoryService {
     public InventoryResponse checkInventory(InventoryRequest inventoryRequest) throws EntityNotFoundException {
 
         List<InventoryRequestItem> inventoryRequestItems = inventoryRequest.getItems();
-        List<InventoryResponseItem> responseItemsList = inventoryRequestItems.stream()
-                .map(InventoryResponseItem::new)
-                .collect(Collectors.toList());
 
         InventoryResponse response = new InventoryResponse();
         response.setOrderId(inventoryRequest.getOrderId());
-        response.setItems(responseItemsList);
-        response.setTotal(new BigDecimal(0));
 
-        responseItemsList = inventoryRequestItems.stream()
+        List<InventoryResponseItem> responseItemsList = inventoryRequestItems.stream()
                 .map(i -> {
 
                     Inventory inventoryItem = inventoryRepository.findByProductId(i.getProductId())
@@ -54,6 +50,7 @@ public class InventoryService {
                     responseItem.setOrderItemId(i.getOrderItemId());
                     responseItem.setProductId(i.getProductId());
                     responseItem.setAvailableQuantity(inventoryItem.getQuantity());
+                    responseItem.setDesiredQuantity(i.getDesiredQuantity());
                     responseItem.setPrice(inventoryItem.getPrice());
 
                     boolean hasEnoughInventory = InventoryUtil.isInventoryAvailable(i.getDesiredQuantity(), inventoryItem.getQuantity());
@@ -100,7 +97,26 @@ public class InventoryService {
         logger.info("Inventory response: {}", response);
 
         return response;
+    }
 
+    public List<InventoryResponseItem> buildResponseItems(List<InventoryRequestItem> requestItems) {
+        return requestItems.stream()
+                .map(reqItem -> {
+                    // 1) Look up the Inventory entity by productId
+                    Inventory inv = inventoryRepository
+                            .findByProductId(reqItem.getProductId())
+                            .orElseThrow(() -> new NoSuchElementException(
+                            "No inventory found for productId=" + reqItem.getProductId()
+                    ));
+
+                    // 2) Create your response DTO combining request quantity + DB price
+                    return new InventoryResponseItem(
+                            inv.getProductId(),
+                            inv.getPrice(), // price from DB
+                            reqItem
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
     public InventoryResponse releaseInventory(ReleaseInventoryRequest releaseInventoryRequest) {

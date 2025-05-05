@@ -1,6 +1,8 @@
 package com.elusivemel.paymentservice.dto;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.elusivemel.paymentservice.model.Payment;
 
@@ -9,9 +11,20 @@ import lombok.ToString;
 @ToString
 public class PaymentResponse {
 
-    private Long orderId;
+    private long orderId;
     private BigDecimal orderTotal;
     private String approved;
+
+    private List<PaymentResponseItem> items;
+
+    public PaymentResponse() {
+        this.items = new ArrayList<>();
+    }
+
+    public PaymentResponse(List<PaymentResponseItem> items, long orderId, BigDecimal total) {
+        this.items = items;
+        this.orderId = orderId;
+    }
 
     public PaymentResponse(Payment payment) {
         this.orderId = payment.getOrderId();
@@ -19,11 +32,19 @@ public class PaymentResponse {
         this.approved = payment.getStatus();
     }
 
-    public Long getOrderId() {
+    public List<PaymentResponseItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<PaymentResponseItem> items) {
+        this.items = items;
+    }
+
+    public long getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(Long orderId) {
+    public void setOrderId(long orderId) {
         this.orderId = orderId;
     }
 

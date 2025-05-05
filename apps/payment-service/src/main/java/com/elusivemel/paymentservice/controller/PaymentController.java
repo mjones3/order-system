@@ -1,5 +1,8 @@
 package com.elusivemel.paymentservice.controller;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.elusivemel.paymentservice.PaymentStatus;
 import com.elusivemel.paymentservice.dto.PaymentRequest;
 import com.elusivemel.paymentservice.dto.PaymentResponse;
+import com.elusivemel.paymentservice.dto.PaymentResponseItem;
 import com.elusivemel.paymentservice.dto.ReleaseInventoryRequest;
 import com.elusivemel.paymentservice.model.Payment;
 import com.elusivemel.paymentservice.service.PaymentService;
@@ -32,8 +36,15 @@ public class PaymentController {
         logger.info("Recieved payment request: {}", paymentRequest);
 
         Payment payment = paymentService.submitPayment(paymentRequest);
-
         PaymentResponse response = new PaymentResponse(payment);
+
+        List<PaymentResponseItem> responseItems = paymentRequest.getItems().stream()
+                // either with a method reference:
+                .map(PaymentResponseItem::new)
+                // or explicitly:
+                //.map(reqItem -> new PaymentResponseItem(reqItem))
+                .collect(Collectors.toList());
+        response.setItems(responseItems);
 
         if (response.getApproved().equals(PaymentStatus.DECLINED.getValue())) {
             logger.info("Payment for orderId = {} not approved.", payment.getOrderId());

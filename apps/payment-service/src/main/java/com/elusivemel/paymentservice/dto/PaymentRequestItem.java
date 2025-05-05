@@ -6,7 +6,8 @@ public class PaymentRequestItem {
 
     private long orderItemId;
     private String productId;
-    private int requestedQuantity;
+    private int desiredQuantity;
+    private int availableQuantity;
     private BigDecimal price;
 
     public long getOrderItemId() {
@@ -33,12 +34,20 @@ public class PaymentRequestItem {
         this.price = price;
     }
 
-    public int getRequestedQuantity() {
-        return requestedQuantity;
+    public int getAvailableQuantity() {
+        return availableQuantity;
     }
 
-    public void setRequestedQuantity(int requestedQuantity) {
-        this.requestedQuantity = requestedQuantity;
+    public void setAvailableQuantity(int availableQuantity) {
+        this.availableQuantity = availableQuantity;
+    }
+
+    public int getDesiredQuantity() {
+        return desiredQuantity;
+    }
+
+    public void setDesiredQuantity(int desiredQuantity) {
+        this.desiredQuantity = desiredQuantity;
     }
 
 }

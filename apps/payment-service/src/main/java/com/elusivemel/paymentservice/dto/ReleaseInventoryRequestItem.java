@@ -6,10 +6,10 @@ public class ReleaseInventoryRequestItem {
     private String productId;
     private int releaseQuantity;
 
-    public ReleaseInventoryRequestItem(PaymentRequestItem inventoryRequestItem) {
-        this.releaseQuantity = inventoryRequestItem.getRequestedQuantity();
-        this.orderItemId = inventoryRequestItem.getOrderItemId();
-        this.productId = inventoryRequestItem.getProductId();
+    public ReleaseInventoryRequestItem(PaymentRequestItem paymentRequestItem) {
+        this.releaseQuantity = paymentRequestItem.getDesiredQuantity();
+        this.orderItemId = paymentRequestItem.getOrderItemId();
+        this.productId = paymentRequestItem.getProductId();
     }
 
     public long getOrderItemId() {

@@ -12,13 +12,17 @@ public class InventoryResponseItem {
     private long orderItemId;
     private String productId;
     private int availableQuantity;
+    private int desiredQuantity;
+
     private BigDecimal price;
 
-    public InventoryResponseItem(InventoryRequestItem requestItem) {
+    public InventoryResponseItem(String productId, BigDecimal price, InventoryRequestItem requestItem) {
         this.orderItemId = requestItem.getOrderItemId();
         this.availableQuantity = requestItem.getDesiredQuantity();
+        this.desiredQuantity = requestItem.getDesiredQuantity();
         this.productId = requestItem.getProductId();
-        this.price = new BigDecimal(0);
+        this.price = price;
+
     }
 
     public InventoryResponseItem(Inventory inventoryItem) {
@@ -60,6 +64,14 @@ public class InventoryResponseItem {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public int getDesiredQuantity() {
+        return desiredQuantity;
+    }
+
+    public void setDesiredQuantity(int desiredQuantity) {
+        this.desiredQuantity = desiredQuantity;
     }
 
 }
