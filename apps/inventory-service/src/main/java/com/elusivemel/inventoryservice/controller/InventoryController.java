@@ -34,6 +34,8 @@ public class InventoryController {
             response = inventoryService.checkInventory(inventoryRequest);
         } catch (EntityNotFoundException entityNotFoundException) {
             logger.error("Error: {}", entityNotFoundException.getMessage());
+            response.setOrderId(inventoryRequest.getOrderId());
+
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
 

@@ -68,6 +68,7 @@ public class InventoryService {
                     } else {
                         logger.error("Not enough inventory for product {} with desired quantity {} and available quantity {}",
                                 i.getProductId(), i.getDesiredQuantity(), inventoryItem.getQuantity());
+
                         throw new EntityNotFoundException("Not enough inventory for product " + i.getProductId());
 
                     }

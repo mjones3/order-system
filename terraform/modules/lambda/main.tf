@@ -4,7 +4,7 @@ resource "aws_sfn_state_machine" "order_saga" {
 
   definition = <<EOF
 {
-  "Comment": "State machine for processing the order saga",
+  "Comment": "State machine for processing the order saga with Choice states",
   "StartAt": "OrderService",
   "States": {
     "OrderService": {
@@ -12,10 +12,14 @@ resource "aws_sfn_state_machine" "order_saga" {
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
         "FunctionName": "${aws_lambda_function.order_service.arn}",
-        "Payload": {
-          "input.$": "$"
-        }
+        "Payload": { "input.$": "$" }
       },
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "FailSaga"
+        }
+      ],
       "Next": "InventoryService"
     },
 
@@ -24,17 +28,27 @@ resource "aws_sfn_state_machine" "order_saga" {
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
         "FunctionName": "${aws_lambda_function.inventory_service.arn}",
-        "Payload": {
-          "input.$": "$"
-        }
+        "Payload": { "input.$": "$" }
       },
       "Catch": [
         {
-          "ErrorEquals": ["NotFound", "HTTPError404"],
+          "ErrorEquals": ["States.ALL"],
+          "Next": "FailSaga"
+        }
+      ],
+      "Next": "CheckInventory"
+    },
+
+    "CheckInventory": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.Payload.statusCode",
+          "NumericEquals": 404,
           "Next": "CancelOrder"
         }
       ],
-      "Next": "PaymentService"
+      "Default": "PaymentService"
     },
 
     "PaymentService": {
@@ -42,17 +56,27 @@ resource "aws_sfn_state_machine" "order_saga" {
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
         "FunctionName": "${aws_lambda_function.payment_service.arn}",
-        "Payload": {
-          "input.$": "$"
-        }
+        "Payload": { "input.$": "$" }
       },
       "Catch": [
         {
-          "ErrorEquals": ["PaymentFailed", "HTTPError402"],
+          "ErrorEquals": ["States.ALL"],
+          "Next": "FailSaga"
+        }
+      ],
+      "Next": "CheckPayment"
+    },
+
+    "CheckPayment": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.Payload.statusCode",
+          "NumericEquals": 402,
           "Next": "ReleaseInventory"
         }
       ],
-      "End": true
+      "Default": "CompleteSaga"
     },
 
     "ReleaseInventory": {
@@ -60,10 +84,14 @@ resource "aws_sfn_state_machine" "order_saga" {
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
         "FunctionName": "${aws_lambda_function.release_inventory.arn}",
-        "Payload": {
-          "input.$": "$"
-        }
+        "Payload": { "input.$": "$" }
       },
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "FailSaga"
+        }
+      ],
       "Next": "CancelOrder"
     },
 
@@ -72,11 +100,18 @@ resource "aws_sfn_state_machine" "order_saga" {
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
         "FunctionName": "${aws_lambda_function.cancel_order.arn}",
-        "Payload": {
-          "input.$": "$"
-        }
+        "Payload": { "input.$": "$" }
       },
       "End": true
+    },
+
+    "CompleteSaga": {
+      "Type": "Succeed"
+    },
+
+    "FailSaga": {
+      "Type": "Fail",
+      "Cause": "SagaFailed"
     }
   }
 }
@@ -147,7 +182,7 @@ resource "aws_lambda_function" "release_inventory" {
 
   environment {
     variables = {
-      API_ENDPOINT_PAYMENT = var.api_endpoint_release_inventory
+      API_ENDPOINT_RELEASE_INVENTORY = var.api_endpoint_release_inventory
     }
   }
 }
@@ -162,7 +197,7 @@ resource "aws_lambda_function" "cancel_order" {
 
   environment {
     variables = {
-      API_ENDPOINT_PAYMENT = var.api_endpoint_cancel_order
+      API_ENDPOINT_CANCEL_ORDER = var.api_endpoint_cancel_order
     }
   }
 }
