@@ -9,4 +9,4 @@ This is a demonstration of the Saga pattern at work with an example ordering sys
 
 ![Architecture Diagram](images/ordersystem.png)
 
-![State Machine](images/State_machine__OrderSagaStateMachine___State_machines___Step_Functions___Step_Functions___us-east-1.jpg)
+![State Machine](images/stepfunctions_graph.png)
