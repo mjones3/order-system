@@ -11,7 +11,7 @@ public class PaymentRequest {
 
     private long orderId;
 
-    private List<PaymentRequestItems> items;
+    private List<PaymentRequestItem> items;
 
     private BigDecimal total;
 
@@ -19,11 +19,11 @@ public class PaymentRequest {
         this.items = new ArrayList<>();
     }
 
-    public List<PaymentRequestItems> getItems() {
+    public List<PaymentRequestItem> getItems() {
         return items;
     }
 
-    public void setItems(List<PaymentRequestItems> items) {
+    public void setItems(List<PaymentRequestItem> items) {
         this.items = items;
     }
 

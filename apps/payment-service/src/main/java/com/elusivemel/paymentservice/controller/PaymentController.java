@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.elusivemel.paymentservice.PaymentStatus;
 import com.elusivemel.paymentservice.dto.PaymentRequest;
 import com.elusivemel.paymentservice.dto.PaymentResponse;
+import com.elusivemel.paymentservice.dto.ReleaseInventoryRequest;
 import com.elusivemel.paymentservice.model.Payment;
-import com.elusivemel.paymentservice.repository.PaymentRepository;
-import com.elusivemel.paymentservice.util.ApprovalSelector;
+import com.elusivemel.paymentservice.service.PaymentService;
 
 @RestController
 @RequestMapping("/api/payments")
@@ -24,37 +24,32 @@ public class PaymentController {
     private static final Logger logger = LogManager.getLogger(PaymentController.class);
 
     @Autowired
-    private final PaymentRepository paymentRepository;
-
-    public PaymentController(PaymentRepository paymentRepository) {
-        this.paymentRepository = paymentRepository;
-    }
+    private PaymentService paymentService;
 
     @PostMapping
-    public ResponseEntity<PaymentResponse> submitPayment(@RequestBody PaymentRequest paymentRequest) {
+    public ResponseEntity<Object> submitPayment(@RequestBody PaymentRequest paymentRequest) {
 
         logger.info("Recieved payment request: {}", paymentRequest);
 
-        Payment payment = new Payment();
+        Payment payment = paymentService.submitPayment(paymentRequest);
 
-        String approval = ApprovalSelector.pickOneThirdAsString(PaymentStatus.APPROVED, PaymentStatus.DECLINED);
+        PaymentResponse response = new PaymentResponse(payment);
 
-        payment.setOrderId(paymentRequest.getOrderId());
-        payment.setTotal(paymentRequest.getTotal());
-        payment.setStatus(approval);
+        if (response.getApproved().equals(PaymentStatus.DECLINED.getValue())) {
+            logger.info("Payment for orderId = {} not approved.", payment.getOrderId());
 
-        Payment savedPayment = paymentRepository.save(payment);
+            ReleaseInventoryRequest releaseInventoryRequest = new ReleaseInventoryRequest(paymentRequest);
 
-        PaymentResponse response = new PaymentResponse(savedPayment);
-
-        if (savedPayment.getStatus().equals(PaymentStatus.DECLINED.getValue())) {
-            logger.info("Payment for orderId = {} not approved.", savedPayment.getOrderId());
-            return new ResponseEntity<>(response, HttpStatus.PAYMENT_REQUIRED);
+            return new ResponseEntity<>(releaseInventoryRequest, HttpStatus.PAYMENT_REQUIRED);
 
         } else {
             logger.info("Payment response: {}", response);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
+    }
+
+    public void setPaymentService(PaymentService paymentService) {
+        this.paymentService = paymentService;
     }
 
 }

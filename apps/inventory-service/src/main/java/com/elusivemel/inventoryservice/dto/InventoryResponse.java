@@ -19,6 +19,12 @@ public class InventoryResponse {
         this.items = new ArrayList<>();
     }
 
+    public InventoryResponse(List<InventoryResponseItem> items, long orderId, BigDecimal total) {
+        this.items = items;
+        this.orderId = orderId;
+        this.total = total;
+    }
+
     public List<InventoryResponseItem> getItems() {
         return items;
     }
@@ -42,7 +48,5 @@ public class InventoryResponse {
     public void setTotal(BigDecimal total) {
         this.total = total;
     }
-
-
 
 }

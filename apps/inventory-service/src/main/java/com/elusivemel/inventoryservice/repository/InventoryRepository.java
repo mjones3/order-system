@@ -9,5 +9,4 @@ import com.elusivemel.inventoryservice.model.Inventory;
 public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
     Optional<Inventory> findByProductId(String productId);
-
 }
