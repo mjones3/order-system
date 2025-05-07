@@ -40,3 +40,12 @@ paymentServiceFunction.checksum
 releaseInventoryFunction.checksum
 inventoryServiceFunction.checksum
 orderServiceFunction.checksum
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+apps/inventory-service/target/inventory-service-0.0.1-SNAPSHOT.jar.original
+apps/inventory-service/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
+apps/inventory-service/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst
+orderServiceFunction.checksum
+inventoryServiceFunction.checksum
+orderCallbackFunction.checksum
+emailServiceFunction.checksum
