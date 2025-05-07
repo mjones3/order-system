@@ -13,7 +13,7 @@ buildNumber.properties
 
 /terraform/.terraform/
 *.jar 
-
+*.class
 .vscode/
 /apps/order-service/target/
 .DS_Store
@@ -21,3 +21,22 @@ Thumbs.db
 
 apps/order-service/.mvn/wrapper/maven-wrapper.properties
 apps/order-service/.mvn/wrapper/MavenWrapperDownloader.java
+apps/functions/cancel-order-handler/cancelOrderFunction.zip
+apps/functions/inventory-service-handler/inventoryServiceFunction.zip
+apps/functions/order-service-handler/orderServiceFunction.zip
+apps/functions/payment-service-handler/paymentServiceFunction.zip
+apps/functions/release-inventory-handler/releaseInventoryFunction.zip
+apps/functions/inventory-service-handler/inventoryServiceFunction.zip
+apps/functions/order-service-handler/orderServiceFunction.zip
+apps/functions/email-service/emailServiceFunction.zip
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+cancelOrderFunction.checksum
+emailServiceFunction.checksum
+inventoryServiceFunction.checksum
+orderCallbackFunction.checksum
+orderServiceFunction.checksum
+paymentServiceFunction.checksum
+releaseInventoryFunction.checksum
+inventoryServiceFunction.checksum
+orderServiceFunction.checksum
