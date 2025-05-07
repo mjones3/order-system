@@ -49,3 +49,5 @@ orderServiceFunction.checksum
 inventoryServiceFunction.checksum
 orderCallbackFunction.checksum
 emailServiceFunction.checksum
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
