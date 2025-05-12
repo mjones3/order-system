@@ -22,9 +22,15 @@ resource "aws_iam_role" "ecs_task_execution_role" {
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy_attachment" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-
 }
 
+# Attach the AWS X-Ray policy to the ECS task execution role
+resource "aws_iam_role_policy_attachment" "xray_role_policy" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
+}
+
+# Additional custom policies (e.g., for SQS)
 resource "aws_iam_role_policy" "ecs_task_execution_sqs_policy" {
   name = "ecs-task-execution-sqs-policy"
   role = aws_iam_role.ecs_task_execution_role.id
@@ -40,7 +46,6 @@ resource "aws_iam_role_policy" "ecs_task_execution_sqs_policy" {
     ]
   })
 }
-
 
 resource "aws_iam_role" "sfn_role" {
   name = "order-saga-sfn-role"
@@ -61,6 +66,12 @@ resource "aws_iam_role" "sfn_role" {
   }
 }
 
+resource "aws_iam_role_policy_attachment" "sfn_xray_policy" {
+  role       = aws_iam_role.sfn_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
+}
+
+# The IAM role Lambda will assume
 resource "aws_iam_role" "lambda_exec_role" {
   name = "lambda_exec_role"
 
@@ -83,11 +94,17 @@ resource "aws_iam_role" "lambda_exec_role" {
   }
 }
 
+# Attach the AWS X-Ray policy to the Lambda execution role
+resource "aws_iam_role_policy_attachment" "lambda_xray_policy" {
+  role       = aws_iam_role.lambda_exec_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
+}
+
+
 resource "aws_iam_role_policy_attachment" "lambda_logging" {
   role       = aws_iam_role.lambda_exec_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
-
 
 resource "aws_iam_role_policy" "sfn_policy" {
   name = "order-saga-sfn-policy"
@@ -107,7 +124,6 @@ resource "aws_iam_role_policy" "sfn_policy" {
           var.aws_lambda_function_payment_service_arn,
           var.aws_lambda_function_release_inventory_arn,
           var.aws_lambda_function_cancel_order_arn,
-
         ]
       }
     ]

@@ -68,6 +68,10 @@ resource "aws_ecs_task_definition" "inventory_service" {
         {
           name  = "DB_PASSWORD"
           value = var.db_password
+        },
+        {
+          name  = "AWS_XRAY_DAEMON_ADDRESS"
+          value = "127.0.0.1:2000"
         }
       ],
       logConfiguration = {

@@ -120,6 +120,7 @@ EOF
     Environment = "dev"
     Project     = "order-system"
   }
+  tracing_configuration { enabled = true }
 }
 
 
@@ -133,6 +134,9 @@ resource "aws_lambda_function" "order_service" {
     variables = {
       API_ENDPOINT_ORDERS = var.api_endpoint_orders
     }
+  }
+  tracing_config {
+    mode = "Active"
   }
   tags = {
     Environment = "dev"
@@ -152,6 +156,9 @@ resource "aws_lambda_function" "inventory_service" {
       API_ENDPOINT_INVENTORY = var.api_endpoint_inventory
     }
   }
+  tracing_config {
+    mode = "Active"
+  }
   tags = {
     Environment = "dev"
     Project     = "order-system"
@@ -170,6 +177,10 @@ resource "aws_lambda_function" "payment_service" {
     variables = {
       API_ENDPOINT_PAYMENT = var.api_endpoint_payment
     }
+
+  }
+  tracing_config {
+    mode = "Active"
   }
 }
 
@@ -185,6 +196,9 @@ resource "aws_lambda_function" "release_inventory" {
       API_ENDPOINT_RELEASE_INVENTORY = var.api_endpoint_release_inventory
     }
   }
+  tracing_config {
+    mode = "Active"
+  }
 }
 
 
@@ -199,5 +213,8 @@ resource "aws_lambda_function" "cancel_order" {
     variables = {
       API_ENDPOINT_CANCEL_ORDER = var.api_endpoint_cancel_order
     }
+  }
+  tracing_config {
+    mode = "Active"
   }
 }

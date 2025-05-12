@@ -1,10 +1,12 @@
 # Stage 1: Build the application using Maven
 FROM maven:3.8.5-openjdk-17-slim AS builder
-WORKDIR .
+WORKDIR /app
+
+# Clear the Maven local repository cache (optional, but helps with stale dependencies)
+RUN rm -rf /root/.m2/repository
 
 # Copy the Maven descriptor and download dependencies (cache layer)
 COPY pom.xml .
-RUN mvn dependency:go-offline -B
 
 # Copy the rest of the application source code
 COPY src ./src
@@ -17,7 +19,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Copy the jar file from the builder stage
-COPY --from=builder /target/inventory-service-0.0.1-SNAPSHOT.jar ./inventory-service.jar
+COPY --from=builder /app/target/inventory-service-0.0.1-SNAPSHOT.jar ./inventory-service.jar
 
 # Expose the port that the Spring Boot application listens on (default 8080)
 EXPOSE 8080
