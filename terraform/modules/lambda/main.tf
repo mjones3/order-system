@@ -102,7 +102,7 @@ resource "aws_sfn_state_machine" "order_saga" {
         "FunctionName": "${aws_lambda_function.cancel_order.arn}",
         "Payload": { "input.$": "$" }
       },
-      "End": true
+      "Next": "FailSaga"
     },
 
     "CompleteSaga": {
