@@ -26,11 +26,6 @@ This is the state machine showing the states when an order is successful.
 
 ![State Machine](images/step-functions-successful-payment.png)
 
-This is the state machine showing the states when an order is cancelled and inventory is restored because payment was not approved.
-
-![State Machine](images/step-functions-definitionstepfunctions_graph.png)
-
-
 Here is the state machine showing the states when an order is cancelled because there is not enough inventory for an item.
 
 ![State Machine](images/step-functions-insufficient-inventory.png)
