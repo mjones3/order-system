@@ -3,14 +3,15 @@ package com.elusivemel.inventoryservice.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.amazonaws.xray.AWSXRay;
+import com.amazonaws.xray.jakarta.servlet.AWSXRayServletFilter;   // new package
+
+import jakarta.servlet.Filter;                                    // Jakarta API
 
 @Configuration
 public class XRayConfig {
 
     @Bean
-    public void configureXRay() {
-        // Enable X-Ray tracing globally
-        AWSXRay.beginSegment("InventoryService");
+    public Filter tracingFilter() {
+        return new AWSXRayServletFilter("InventoryService");
     }
 }
