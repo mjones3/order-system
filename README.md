@@ -22,20 +22,31 @@ Here is a breakdown of each state in the state machine:
 6) **ReleaseInventory**: This is the _compensation_ for the inventory that was subtracted in the InventoryService state.  The previously subtracted inventory is added back to the _inventory_ table for the product.
 7) **CancelOrder**: This is the _compensation_ for the order that was created by the OrderService.  The order status is marked CANCELED. 
 
+This is the state machine showing the states when an order is successful.
+
+![State Machine](images/step-functions-successful-payment.png)
 
 This is the state machine showing the states when an order is cancelled and inventory is restored because payment was not approved.
 
-![State Machine](images/stepfunctions_graph.png)
+![State Machine](images/step-functions-definitionstepfunctions_graph.png)
 
 
 Here is the state machine showing the states when an order is cancelled because there is not enough inventory for an item.
 
-![State Machine](images/stepfunctions-no-inventory.png)
+![State Machine](images/step-functions-insufficient-inventory.png)
+
+The image here shows that state machine when payment fails.
+
+![State Machine](images/step-functions-failed-payment.png)
 
 
-This is the state machine showing the states when an order is successful.
 
-![State Machine](images/step-functions-complete-payment.png)
+
+### X-Ray Tracing ###
+
+X-Ray tracing is enabled for this application, illustrating how to use tracing across microservices.
+
+![X-Ray](images/x-ray-trace-map.jpg)
 
 
 ## Building the project ## 
